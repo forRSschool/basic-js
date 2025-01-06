@@ -20,64 +20,49 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  constructor(isDirect = true) {
-    this.isDirect = isDirect;
+  constructor(method = true) {
+    this.method = method;
+    this.alph = 'abcdefghijklmnopqrstuvwxyz';
+  }
+
+  map(string) {
+    return string.split('').map((el) => this.alph.includes(el) ? this.alph.indexOf(el) : el);
   }
 
   encrypt(message, key) {
-    if (!message || !key) {
-      throw new Error('Invalid arguments');
-    }
+    if (!message || !key) throw new Error('Incorrect arguments!');
+    let messageMap = this.map(message.toLowerCase());
+    const keyMap = this.map(key.toLowerCase());
+    let count = 0;
 
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    message = message.toUpperCase();
-    key = key.toUpperCase();
-    let cipherText = '';
-    let keyIndex = 0;
-
-    for (let i = 0; i < message.length; i++) {
-      const char = message[i];
-
-      if (alphabet.includes(char)) {
-        const messageCharIndex = alphabet.indexOf(char);
-        const keyCharIndex = alphabet.indexOf(key[keyIndex % key.length]);
-        const encryptedCharIndex = (messageCharIndex + keyCharIndex) % 26;
-        cipherText += alphabet[encryptedCharIndex];
-        keyIndex++;
-      } else {
-        cipherText += char;
+    messageMap.forEach((el, i, arr) => {
+      if (typeof el === 'number') {
+        const index = (el + keyMap[count]) % 26;
+        arr[i] = this.alph[index];
+        count++;
+        if (count >= keyMap.length) count = 0;
       }
-    }
+    });
 
-    return this.isDirect ? cipherText : cipherText.split('').reverse().join('');
+    return this.method ? messageMap.join('').toUpperCase() : messageMap.reverse().join('').toUpperCase(); 
   }
-
   decrypt(message, key) {
-    if (!message || !key) {
-      throw new Error('Invalid arguments');
-    }
+    if (!message || !key) throw new Error('Incorrect arguments!');
+    let messageMap = this.map(message.toLowerCase());
+    const keyMap = this.map(key.toLowerCase());
+    let count = 0;
 
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    message = message.toUpperCase();
-    key = key.toUpperCase();
-    let decryptedText = '';
-    let keyIndex = 0;
-
-    for (let i = 0; i < message.length; i++) {
-      const char = message[i];
-
-      if (alphabet.includes(char)) {
-        const messageCharIndex = alphabet.indexOf(char);
-        const keyCharIndex = alphabet.indexOf(key[keyIndex % key.length]);
-        const decryptedCharIndex = (messageCharIndex - keyCharIndex + 26) % 26;
-        decryptedText += alphabet[decryptedCharIndex];
-        keyIndex++;
-      } else {
-        decryptedText += char;
+    messageMap.forEach((el, i, arr) => {
+      if (typeof el === 'number') {
+        let index = (el - keyMap[count]) % 26;
+        if (index < 0) index = (index + 26) % 26;
+        arr[i] = this.alph[index];
+        count++;
+        if (count >= keyMap.length) count = 0;
       }
-    }
+    });
 
-    return this.isDirect ? decryptedText : decryptedText.split('').reverse().join('');
+    return this.method ? messageMap.join('').toUpperCase() : messageMap.reverse().join('').toUpperCase(); 
   }
 }
 

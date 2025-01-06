@@ -11,15 +11,18 @@ const { NotImplementedError } = require('../extensions/index.js');
  * For n = 152, the output should be 52
  *
  */
-function deleteDigit( n ) {
+function deleteDigit(n) {
   const arr = n.toString().split('');
-  arr
-    .sort((a, b) => b - a)
-    .pop();
-  const res = Number(arr.join(''))
+  let maxNumber = -Infinity;
   
-  return res;
+  for (let i = 0; i < arr.length; i++) {
+    const newNumber = Number(arr.slice(0, i).concat(arr.slice(i + 1)).join(''));
+    maxNumber = Math.max(maxNumber, newNumber);
+  }
+  
+  return maxNumber;
 }
+
 
 
 module.exports = {
