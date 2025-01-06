@@ -20,13 +20,64 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  constructor(isDirect = true) {
+    this.isDirect = isDirect;
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  encrypt(message, key) {
+    if (!message || !key) {
+      throw new Error('Invalid arguments');
+    }
+
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    message = message.toUpperCase();
+    key = key.toUpperCase();
+    let cipherText = '';
+    let keyIndex = 0;
+
+    for (let i = 0; i < message.length; i++) {
+      const char = message[i];
+
+      if (alphabet.includes(char)) {
+        const messageCharIndex = alphabet.indexOf(char);
+        const keyCharIndex = alphabet.indexOf(key[keyIndex % key.length]);
+        const encryptedCharIndex = (messageCharIndex + keyCharIndex) % 26;
+        cipherText += alphabet[encryptedCharIndex];
+        keyIndex++;
+      } else {
+        cipherText += char;
+      }
+    }
+
+    return this.isDirect ? cipherText : cipherText.split('').reverse().join('');
+  }
+
+  decrypt(message, key) {
+    if (!message || !key) {
+      throw new Error('Invalid arguments');
+    }
+
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    message = message.toUpperCase();
+    key = key.toUpperCase();
+    let decryptedText = '';
+    let keyIndex = 0;
+
+    for (let i = 0; i < message.length; i++) {
+      const char = message[i];
+
+      if (alphabet.includes(char)) {
+        const messageCharIndex = alphabet.indexOf(char);
+        const keyCharIndex = alphabet.indexOf(key[keyIndex % key.length]);
+        const decryptedCharIndex = (messageCharIndex - keyCharIndex + 26) % 26;
+        decryptedText += alphabet[decryptedCharIndex];
+        keyIndex++;
+      } else {
+        decryptedText += char;
+      }
+    }
+
+    return this.isDirect ? decryptedText : decryptedText.split('').reverse().join('');
   }
 }
 
